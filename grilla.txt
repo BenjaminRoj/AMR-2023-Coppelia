@@ -1,0 +1,123 @@
+import numpy as np
+import heapq
+
+class Node:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.neighbors = {'up': None, 'down': None, 'right': None, 'left': None}
+        self.g = float('inf')  # Cost from start to this node
+        self.h = float('inf')  # Heuristic cost to goal
+        self.f = float('inf')  # Total cost
+        self.parent = None  # For path reconstruction
+
+    def set_neighbors(self, grid, delta):
+        self.neighbors['up'] = grid.get((self.x, round(self.y + delta, 1)))
+        self.neighbors['down'] = grid.get((self.x, round(self.y - delta, 1)))
+        self.neighbors['right'] = grid.get((round(self.x + delta, 1), self.y))
+        self.neighbors['left'] = grid.get((round(self.x - delta, 1), self.y))
+
+    def __repr__(self):
+        return f"Node({self.x}, {self.y})"
+
+def heuristic(node1, node2):
+    # Using Manhattan distance as the heuristic
+    return abs(node1.x - node2.x) + abs(node1.y - node2.y)
+
+def create_grid_inclusive(x_start, x_end, y_start, y_end, delta):
+    grid = {(round(x, 1), round(y, 1)): Node(round(x, 1), round(y, 1)) 
+            for x in np.arange(x_start, x_end + delta, delta)  # Incluyendo el punto final
+            for y in np.arange(y_start, y_end + delta, delta)}
+    for node in grid.values():
+        node.set_neighbors(grid, delta)
+    return grid
+
+
+def create_grid(x_start, x_end, y_start, y_end, delta):
+    grid = {(round(x, 1), round(y, 1)): Node(round(x, 1), round(y, 1)) 
+            for x in np.arange(x_start, x_end, delta) 
+            for y in np.arange(y_start, y_end, delta)}
+    for node in grid.values():
+        node.set_neighbors(grid, delta)
+    return grid
+
+def reconstruct_path(end_node):
+    path = []
+    current_node = end_node
+    while current_node:
+        path.append((current_node.x, current_node.y))
+        current_node = current_node.parent
+    return path[::-1]  # Return reversed path
+
+def a_star_search_improved(grid, start, goal):
+    start_node = grid[start]
+    goal_node = grid[goal]
+
+    start_node.g = 0
+    start_node.h = heuristic(start_node, goal_node)
+    start_node.f = start_node.h
+
+    open_set = []
+    heapq.heappush(open_set, (start_node.f, id(start_node), start_node))
+    closed_set = set()
+
+    while open_set:
+        _, _, current_node = heapq.heappop(open_set)
+
+        if current_node == goal_node:
+            return reconstruct_path(current_node)
+
+        closed_set.add(current_node)
+
+        for neighbor in current_node.neighbors.values():
+            if neighbor and neighbor not in closed_set:
+
+		'''if current_node.step_count % 3 == 2 and direction == 'right':
+                continue'''
+
+                tentative_g = current_node.g + 1  # Assuming uniform cost for each step
+
+                if tentative_g < neighbor.g:
+                    neighbor.parent = current_node
+                    neighbor.g = tentative_g
+                    neighbor.h = heuristic(neighbor, goal_node)
+                    neighbor.f = neighbor.g + neighbor.h
+
+                    if neighbor not in [item[2] for item in open_set]:
+                        heapq.heappush(open_set, (neighbor.f, id(neighbor), neighbor))
+
+    return None  # Path not found
+
+# Run A* search with improved implementation
+
+
+
+
+# Create the grid
+grid = create_grid(-2.5, 2.5, -2.5, 2.5, 0.1)
+
+# Define start and goal coordinates
+start_coords = (-2.5, -2.5)
+goal_coords = (2.4, 2.4)
+# Verificar si el nodo de inicio y el nodo objetivo están dentro de la cuadrícula y tienen vecinos conectados
+start_node_check = grid.get(start_coords, None)
+goal_node_check = grid.get(goal_coords, None)
+
+# Imprimir detalles del nodo de inicio y del nodo objetivo
+start_node_details = f"Start Node: {start_node_check}, Neighbors: {start_node_check.neighbors if start_node_check else 'N/A'}"
+goal_node_details = f"Goal Node: {goal_node_check}, Neighbors: {goal_node_check.neighbors if goal_node_check else 'N/A'}"
+
+print(start_node_details, goal_node_details)
+
+# Crear una cuadrícula que incluya los puntos finales
+grid_inclusive = create_grid_inclusive(-2.5, 2.5, -2.5, 2.5, 0.1)
+
+# Volver a intentar la búsqueda A* con la cuadrícula actualizada
+goal_coords_inclusive = (2.5, 2.5)  # Actualizar el nodo objetivo para que esté dentro del rango
+path_inclusive = a_star_search_improved(grid_inclusive, start_coords, goal_coords)
+print(path_inclusive[:])  # Mostrar los primeros 10 pasos del camino para brevedad
+
+
+
+
+

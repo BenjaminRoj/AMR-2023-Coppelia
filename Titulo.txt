@@ -1,0 +1,85 @@
+import sim
+import math
+import sys
+import time
+
+#-------------Mover diagonal atras izquierda-------------
+def MoveAI(v, clientID, h):
+    sim.simxSetJointTargetVelocity(clientID, h[0], -v, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[1], 0, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[2], v, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[3], 0, sim.simx_opmode_blocking)
+#-------------Mover diagonal adelante derecha------------
+def MoveAD(v, clientID, h):
+    sim.simxSetJointTargetVelocity(clientID, h[0], v, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[1], 0, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[2], -v, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[3], 0, sim.simx_opmode_blocking)
+#-------------Mover diagonal adelante izquierda
+def MoveAI(v, clientID, h):
+    sim.simxSetJointTargetVelocity(clientID, h[0], 0, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[1], -v, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[2], 0, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[3], v, sim.simx_opmode_blocking)
+#-------------Mover diagonal adelante izquierda-------------
+def MoveAIZ(v, clientID, h):
+    sim.simxSetJointTargetVelocity(clientID, h[0], 0, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[1], -v, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[2], 0, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[3], v, sim.simx_opmode_blocking)
+#-------------Mover diagonal atras derecha-------------
+def MoveADD(v, clientID, h):
+    sim.simxSetJointTargetVelocity(clientID, h[0], 0, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[1], v, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[2], 0, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[3], -v, sim.simx_opmode_blocking)
+#-------------Girar a la derecha-------------
+def TurnRight(v, clientID, h):
+    sim.simxSetJointTargetVelocity(clientID, h[0], v, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[1], v, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[2], v, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[3], v, sim.simx_opmode_blocking)
+#-------------Girar a la izquierda-------------
+def TurnLeft(v, clientID, h):
+    sim.simxSetJointTargetVelocity(clientID, h[0], -v, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[1], -v, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[2], -v, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[3], -v, sim.simx_opmode_blocking)
+#-------------Mover hacia adelante-------------
+def MoveForward(v, clientID, h):
+    sim.simxSetJointTargetVelocity(clientID, h[0], v, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[1], -v, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[2], -v, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[3], v, sim.simx_opmode_blocking)
+#-------------Mover hacia atras-------------
+def MoveBackward(v, clientID, h):
+    sim.simxSetJointTargetVelocity(clientID, h[0], -v, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[1], v, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[2], v, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[3], -v, sim.simx_opmode_blocking)
+#-------------Mover hacia izquierda-------------
+def MoveLeft(v, clientID, h):
+    sim.simxSetJointTargetVelocity(clientID, h[0], -v, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[1], -v, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[2], v, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[3], v, sim.simx_opmode_blocking)
+#-------------Mover hacia derecha-------------
+def MoveRight(v, clientID, h):
+    sim.simxSetJointTargetVelocity(clientID, h[0], v, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[1], v, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[2], -v, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[3], -v, sim.simx_opmode_blocking)
+#-------------Detenerse-------------
+def Stop(clientID, h):
+    sim.simxSetJointTargetVelocity(clientID, h[0], 0, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[1], 0, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[2], 0, sim.simx_opmode_blocking)
+    sim.simxSetJointTargetVelocity(clientID, h[3], 0, sim.simx_opmode_blocking)
+    
+
+    #h1 rueda delantera izquierda + adelante - atras
+    #h2 rueda delantera derecha - adelante + atras
+    #h3 rueda trasera derecha - adelante + atras
+    #h4 rueda trasera izquierda + adelante - atras
+
+

@@ -1,0 +1,56 @@
+import sim
+import math
+import sys
+import time
+import numpy as np
+import Titulo as tl
+import test_slam as slam
+import matplotlib.pyplot as plt
+
+
+sim.simxFinish(-1)  # Cierre cualquier conexión previa
+clientID = sim.simxStart('127.0.0.1', 19999, True, True, 5000, 5)  # Conéctate a CoppeliaSim
+
+if clientID != -1:
+    print('Conexión establecida con CoppeliaSim')
+else:
+    print('No se pudo establecer la conexión con CoppeliaSim')
+    sys.exit('No se pudo conectar')
+        
+# Obtener identificadores de los motores
+returnCode,h1 = sim.simxGetObjectHandle(clientID, ':/FLwheel_motor', sim.simx_opmode_blocking)
+returnCode,h2 = sim.simxGetObjectHandle(clientID, './FRwheel_motor', sim.simx_opmode_blocking)
+returnCode,h3 = sim.simxGetObjectHandle(clientID, './RRwheel_motor', sim.simx_opmode_blocking)
+returnCode,h4 = sim.simxGetObjectHandle(clientID, './RLwheel_motor', sim.simx_opmode_blocking )
+h = [h1, h2, h3, h4]
+
+v = 100 * math.pi / 180
+plt.figure()
+while 1:
+    #entrega las coordenadas del mapeo con metodo slam
+    plt.clf()
+    _, p1 = sim.simxGetObjectPosition(clientID, h1, -1, sim.simx_opmode_blocking)
+    _, p2 = sim.simxGetObjectPosition(clientID, h2, -1, sim.simx_opmode_blocking)
+    _, p3 = sim.simxGetObjectPosition(clientID, h3, -1, sim.simx_opmode_blocking)
+    _, p4 = sim.simxGetObjectPosition(clientID, h4, -1, sim.simx_opmode_blocking)
+        ##############################################################################################################################################################################
+    points = [p1, p2, p3, p4]
+    x_positions, y_positions = slam.Slam_Kalman(clientID, points)
+    plt.plot([2.356140389882804, -2.385794158162124, -2.385794158162124, 2.356140389882804, 2.356140389882804],
+             [2.41534566138077, 2.41534566138077, -2.3198942920368557, -2.3198942920368557, 2.41534566138077])
+    plt.scatter(x_positions, y_positions, color='blue', label="a")
+    plt.xlabel('Coordenada X')
+    plt.ylabel('Coordenada Y')
+    plt.title('AGV 1')
+    plt.grid()
+    slam.simulate_robot_path(x_positions, y_positions, clientID, points)
+    
+    
+    time.sleep(0.1)
+plt.show()
+tl.MoveForward(v, clientID, h)
+
+
+sim.simxGetPingTime(clientID)  # Asegurarse de que no se bloquea
+sim.simxFinish(clientID)  # Cerrar la conexión al final
+
